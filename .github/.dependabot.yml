@@ -1,0 +1,16 @@
+# Basic set up for three package managers
+
+version: 2
+updates:
+  # Monthly updates for Catarse Rails Back-end
+  - package-ecosystem: "bundler"
+    directory: "/services/catarse"
+    schedule:
+      interval: "monthly"
+      time: "07:00"
+      timezone: "America/Sao_Paulo"
+    commit-message:
+      prefix: "💎 "
+    rebase-strategy: "disabled"
+    target-branch: "develop"
+    versioning-strategy: "increase"
