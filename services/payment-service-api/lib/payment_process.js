@@ -12,6 +12,7 @@ const { genAFMetadata } = require('./antifraud_context_gen');
 const { generateDalContext } = require('./dal');
 const { buildTransactionData } = require('./transaction_data_builder');
 const { buildAntifraudData } = require('./konduto_data_builder')
+const { handleError } = require('./error_handling');
 let transactionID
 
 /*
@@ -228,11 +229,13 @@ const processPayment = async (dbclient, paymentId) => {
 
         if (transactionID) {
             try {
+                handleError(err);
                 let client = await gatewayClient();
                 await client.withVersion('2019-09-01').transactions.refund({ id: transactionID });
             } catch(err) {
                 console.log('error when refunding transaction ', transactionID)
                 console.log('error:', err)
+                handleError(err);
             }
         }
 
@@ -245,6 +248,7 @@ const processPayment = async (dbclient, paymentId) => {
                 await dalCtx.updateGatewayDataOnPayment(paymentId, err.response.errors);
                 await dbclient.query('COMMIT;')
             } catch(db_err) {
+                handleError(db_err);
                 console.log('error when transition payment to error -> ', db_err);
             }
         }
